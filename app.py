@@ -2,46 +2,96 @@ import streamlit as st
 
 st.set_page_config(page_title="IA Foot Predictor", page_icon="⚽", layout="centered")
 
+# Style CSS personnalisé pour imiter l'interface de l'image
+st.markdown("""
+<style>
+    .stApp {
+        background-color: #0b1a30;
+        color: white;
+    }
+    .match-card {
+        background-color: #1a365d;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .league-title {
+        background-color: #2b4c7e;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    .pred-badge {
+        background-color: #e2e8f0;
+        color: #1a202c;
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    .stButton>button {
+        background-color: #22c55e !important;
+        color: white !important;
+        font-weight: bold !important;
+        border-radius: 8px !important;
+        width: 100%;
+        border: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("⚽ IA Foot Predictor")
-st.write("Bienvenue sur votre application de pronostics !")
 
-# Liste étendue des équipes principales par championnat
-TEAMS = sorted([
-    # Premier League
-    "Arsenal", "Aston Villa", "Chelsea", "Coventry City", "Everton", "Fulham", "Manchester City", "Tottenham Hotspur",
-    # LaLiga & LaLiga2
-    "Almería", "Atlético Madrid", "Celta Fortuna", "Córdoba CF", "Eibar", "Elche", "Espanyol", "Girona", "Las Palmas", 
-    "Leganés", "Racing Santander", "Rayo Vallecano", "RC Deportivo", "RCD Mallorca", "Real Oviedo", "Real Sociedad B", "Valencia", "Villarreal",
-    # Serie A & Serie B
-    "Avellino", "Bologna", "Cagliari", "Cesena", "Como", "FC Südtirol", "Lazio", "Modena", "Napoli", "Padova", "Parma", "Roma", "Sampdoria", "Sassuolo",
-    # Bundesliga
-    "B. Dortmund", "Eintracht Frankfurt", "FC Augsburg", "Hamburger SV", "Köln", "Mainz 05", "Paderborn", "RB Leipzig", "Schalke 04", "SV Elversberg", "Union Berlin", "Werder Bremen",
-    # Ligue 1 & Ligue 2
-    "Lens", "Lyon", "Paris FC", "Paris SG",
-    # Competitions CAF
-    "AC Douane", "AFAD", "Al Ahli Tripoli", "Al-Merreikh SC", "APR FC", "Asswehly SC", "Azam FC", "Black Bulls Maputo", "CR Belouizdad", "CS Sfaxien", "ES Tunis", "Horoya AC", "Pyramids", "Real Bamako", "Rayon Sport", "RSB Berkane", "Star Sport", "Welwalo Adigrat", "Zamalek", "Zarzis", "Zed FC",
-    # MLS
-    "Atlanta United", "CF Montréal", "Chicago Fire", "Cincinnati", "Columbus Crew", "DC United", "Inter Miami", "Nashville SC", "New England Revolution", "New York City", "New York RB", "Orlando City", "Philadelphia Union", "Toronto FC",
-    # Eredivisie & Liga Portugal
-    "ADO Den Haag", "Arouca", "Cambuur", "Casa Pia AC", "Estrela da Amadora", "FC Alverca", "Heerenveen", "PEC Zwolle", "Utrecht", "Willem II"
-])
+# Onglets de navigation (Aujourd'hui / Demain / Weekend)
+tab1, tab2, tab3 = st.tabs(["Aujourd'hui", "Demain", "Weekend"])
 
-# Interface de sélection
-col1, col2 = st.columns(2)
+def render_match(home, away, home_logo, away_logo, match_time, pred):
+    st.markdown(f"""
+    <div class="match-card">
+        <div style="display: flex; justify-content: space-around; align-items: center;">
+            <div style="width: 35%;">
+                <img src="{home_logo}" width="50" style="margin-bottom: 5px;"/><br/>
+                <strong>{home}</strong>
+            </div>
+            <div style="width: 30%;">
+                <div style="color: #4ade80; font-size: 14px;">{match_time}</div>
+            </div>
+            <div style="width: 35%;">
+                <img src="{away_logo}" width="50" style="margin-bottom: 5px;"/><br/>
+                <strong>{away}</strong>
+            </div>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="pred-badge">👉 {pred}</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with col1:
-    home_team = st.selectbox("Équipe à Domicile", TEAMS, index=TEAMS.index("Paris SG") if "Paris SG" in TEAMS else 0)
+with tab1:
+    st.markdown('<div class="league-title">🏴ⁿ visual ANGLETERRE: PREMIER LEAGUE</div>', unsafe_allow_html=True)
+    
+    # Match 1
+    render_match(
+        "Aston Villa", "Manchester City",
+        "https://media.api-sports.io/football/teams/66.png",
+        "https://media.api-sports.io/football/teams/50.png",
+        "24 OCT. 11:30", "1 - 2"
+    )
+    if st.button("Aperçu, stats et cotes »", key="btn1"):
+        st.info("📊 Stats IA : Manchester City favori (65% de chances de victoire). Pronostic Over 2.5 Buts.")
 
-with col2:
-    away_team = st.selectbox("Équipe à l'Extérieur", TEAMS, index=TEAMS.index("Lyon") if "Lyon" in TEAMS else 1)
-
-if st.button("🚀 Lancer l'analyse IA"):
-    if home_team == away_team:
-        st.warning("Veuillez sélectionner deux équipes différentes.")
-    else:
-        st.success(f"Analyse terminée pour {home_team} vs {away_team} !")
-        st.subheader("🎯 Pronostics :")
+    # Match 2
+    render_match(
+        "Arsenal", "Everton",
+        "https://media.api-sports.io/football/teams/42.png",
+        "https://media.api-sports.io/football/teams/45.png",
+        "24 OCT. 14:00", "3 - 1"
+    )
+    if st.button("Aperçu, stats et cotes »", key="btn2"):
+        st.info("📊 Stats IA : Arsenal favori à domicile. Pronostic Victoire 1 avec handicap.")
         
-        # Exemple de logique de simulation
-        st.info("• **1N2 :** Victoire à domicile ou Match Nul (1X)")
-        st.info("• **Buts :** Plus de 1.5 buts dans le match")
